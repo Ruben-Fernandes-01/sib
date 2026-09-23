@@ -125,6 +125,73 @@ class Dataset:
             "var": self.get_variance()
         }
         return pd.DataFrame.from_dict(data, orient="index", columns=self.features)
+    def dropna(self) -> "Dataset":
+        """
+        Remove todas as amostras que contenham pelo menos um valor nulo (NaN).
+        Atualiza X e, se existir, y.
+
+        Returns
+        -------
+        self: Dataset
+            O próprio dataset, modificado.
+        """
+        mask = ~np.isnan(self.X).any(axis=1)
+
+        self.X = self.X[mask]
+        if self.y is not None:
+            self.y = self.y[mask]
+
+        return self
+
+    def fillna(self, value: Union[float, str]) -> "Dataset":
+        """
+        Substitui os valores nulos (NaN) de X por um valor fixo,
+        pela média ou pela mediana de cada feature.
+
+        Parameters
+        ----------
+        value: float or "mean" or "median"
+
+        Returns
+        -------
+        self: Dataset
+            O próprio dataset, modificado.
+        """
+        if value == "mean":
+            fill_values = self.get_mean()
+            inds = np.where(np.isnan(self.X))
+            self.X[inds] = np.take(fill_values, inds[1])
+
+        elif value == "median":
+            fill_values = self.get_median()
+            inds = np.where(np.isnan(self.X))
+            self.X[inds] = np.take(fill_values, inds[1])
+
+        else:
+            self.X = np.nan_to_num(self.X, nan=value)
+
+        return self
+
+    def remove_by_index(self, index: int) -> "Dataset":
+        """
+        Remove uma amostra do dataset pelo seu índice.
+        Atualiza X e, se existir, y.
+
+        Parameters
+        ----------
+        index: int
+            Índice da amostra a remover.
+
+        Returns
+        -------
+        self: Dataset
+            O próprio dataset, modificado.
+        """
+        self.X = np.delete(self.X, index, axis=0)
+        if self.y is not None:
+            self.y = np.delete(self.y, index, axis=0)
+
+        return self
 
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame, label: str = None):
