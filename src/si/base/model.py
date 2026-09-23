@@ -68,3 +68,17 @@ class Model(Estimator, ABC):
         """
         self.fit(dataset)
         return self.predict(dataset)
+
+    def score(self, dataset):
+        """
+        Calcula o erro/score do modelo no dataset.
+        """
+        if not self.is_fitted:
+            raise ValueError('Model needs to be fitted before calling score()')
+        return self._score(dataset)
+
+    @abstractmethod
+    def _score(self, dataset):
+        """
+        Calcula o erro/score do modelo no dataset.
+        """
