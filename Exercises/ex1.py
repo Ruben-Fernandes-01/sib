@@ -1,6 +1,6 @@
 from si.io.csv_file import read_csv
 
-ds = read_csv("/Users/rubenfernandes/sib/datasets/iris/iris.csv",
+ds = read_csv("/datasets/iris/iris.csv",
               sep=",", features=True, label=True)
 
 # 1.1) já carregado acima
